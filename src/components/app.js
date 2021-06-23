@@ -12,6 +12,7 @@ import Home from "./pages/home";
 import About from "./pages/about";
 import Contact from "./pages/contact";
 import Blog from "./pages/blog";
+import PortfolioDetail from "./portfolio/portfolio-detail";
 
 export default class App extends Component {
 
@@ -21,6 +22,7 @@ export default class App extends Component {
 
         return (
             <div className='app'>
+                <h1>Hayden Carroll Portfolio</h1>
 
                 <Router>
                     <div>
@@ -30,15 +32,14 @@ export default class App extends Component {
                             <Route path="/about-me" component={About} />
                             <Route path="/contact" component={Contact} />
                             <Route path="/blog" component={Blog} />
+                            <Route path="/portfolio/:slug" component={PortfolioDetail} />
                         </Switch>
                     </div>
                 </Router>
 
-                <h1>Hayden Carroll Portfolio</h1>
                 <div>
                     {moment().format("MMMM Do YYYY, h:mm:ss a")}
                 </div>
-                <PortfolioContainer />
               
           </div>
       );
