@@ -23,7 +23,7 @@ export default class App extends Component {
         
 
         return (
-            <div className='app'>
+            <div className='container'>
 
                 <Router>
                     <div>
