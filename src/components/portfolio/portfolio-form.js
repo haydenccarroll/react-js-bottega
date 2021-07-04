@@ -1,21 +1,46 @@
 import React, {Component} from "react";
 import axios from "axios";
+import DropzoneComponent from "react-dropzone-component";
+
+import "../../../node_modules/react-dropzone-component/styles/filepicker.css";
+import "../../../node_modules/dropzone/dist/min/dropzone.min.css";
+
 class PortfolioForm extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            name: "",
-            description: "",
-            url: "",
-            category: "",
-            position: "",
-            thumb_image: "",
-            banner_image: "",
-            logo: ""
-        }
+        this.state = this.getInitialState();
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.componentConfig = this.componentConfig.bind(this);
+        this.djsConfig = this.djsConfig.bind(this);
+        this.handleThumbDrop = this.handleThumbDrop.bind(this);
+        this.handleBannerDrop = this.handleBannerDrop.bind(this);
+        this.handleLogoDrop = this.handleLogoDrop.bind(this);
+
+
+        this.thumbRef = React.createRef();
+        this.bannerRef = React.createRef();
+        this.logoRef = React.createRef();
+    }
+
+    getInitialState = () => ({
+        name: "",
+        description: "",
+        url: "",
+        category: "",
+        position: "",
+        thumb_image: "",
+        banner_image: "",
+        logo: ""
+    })
+
+    resetForm = () => {
+        console.log("reset form started");
+        this.setState(this.getInitialState());
+        [this.thumbRef, this.bannerRef, this.logoRef].forEach(ref => {
+            ref.current.dropzone.removeAllFiles();
+        });
     }
 
     handleChange(event) {
@@ -24,12 +49,47 @@ class PortfolioForm extends Component {
         });
     }
 
+    handleThumbDrop() {
+        return {
+            addedfile: file => this.setState({thumb_image: file})
+        };
+    }
+
+    handleBannerDrop() {
+        return {
+            addedfile: file => this.setState({banner_image: file})
+        };
+    }
+
+    handleLogoDrop() {
+        return {
+            addedfile: file => this.setState({logo: file})
+        };
+    }
+
+    componentConfig() {
+        return {
+            iconFiletypes: [".jpg", ".png"],
+            showFiletypeIcon: true,
+            postUrl: "https://httpbin.org/post"
+        }
+    }
+
+    djsConfig() {
+        return {
+            addRemoveLinks: true,
+            maxFiles: 1
+        }
+    }
     handleSubmit(event) {
-        axios.post("https://jordan.devcamp.space/portfolio/portfolio_items",
+        axios.post("https://haydenccarroll.devcamp.space/portfolio/portfolio_items",
             this.buildForm(),
             {withCredentials: true}
         ).then(response => {
+            console.log("this was the response::", response);
             this.props.handleSuccessfulFormSubmission(response.data.portfolio_item);
+
+            this.resetForm();
         }).catch(error => {
             console.log("portfolio form handleSubmit error", error);
         });
@@ -45,6 +105,19 @@ class PortfolioForm extends Component {
         formData.append("portfolio_item[url]", this.state.url);
         formData.append("portfolio_item[category]", this.state.category);
         formData.append("portfolio_item[position]", this.state.position);
+
+        if (this.state.thumb_image) {
+            formData.append("portfolio_item[thumb_image]", this.state.thumb_image);
+        }
+
+        if (this.state.banner_image) {
+            formData.append("portfolio_item[banner_image]", this.state.banner_image);
+        }
+
+        if (this.state.logo) {
+            formData.append("portfolio_item[logo]", this.state.logo);
+        }
+
 
 
         return formData;
@@ -99,7 +172,30 @@ class PortfolioForm extends Component {
                             placeholder="description"
                             value={this.state.description}
                             onChange={this.handleChange}
-                        />  
+                        />
+                    </div>
+
+                    <div className="image-uploaders">
+                        <DropzoneComponent
+                            config={this.componentConfig()}
+                            djsConfig={this.djsConfig()}
+                            eventHandlers={this.handleThumbDrop()}
+                            ref={this.thumbRef}
+                        ></DropzoneComponent>
+
+                        <DropzoneComponent
+                            config={this.componentConfig()}
+                            djsConfig={this.djsConfig()}
+                            eventHandlers={this.handleBannerDrop()}
+                            ref={this.bannerRef}
+                        ></DropzoneComponent>
+
+                        <DropzoneComponent
+                            config={this.componentConfig()}
+                            djsConfig={this.djsConfig()}
+                            eventHandlers={this.handleLogoDrop()}
+                            ref={this.logoRef}
+                        ></DropzoneComponent>
                     </div>
 
                     <div>
